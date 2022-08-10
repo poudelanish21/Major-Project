@@ -1,6 +1,18 @@
 #include <iostream>
 #include <vector>
 
+unsigned int getEquivalentGrayCode(unsigned int Number) {
+
+	return (Number >> 1) ^ Number;
+
+}
+
+void LogError(std::string Msg) {
+
+	std::cout << "\n" << "Msg \t:" << Msg << "\n";
+
+}
+
 class BITS {
 
 	unsigned int NumberOfBits = 0;
@@ -200,7 +212,7 @@ std::string GetExpressionFromGroup(unsigned int* Array, unsigned int size, unsig
 
 	}
 #endif
-	std::string digits[8] = { "A", "B", "C", "D" , "E", "F", "G", "H"};
+	std::string digits[4] = { "A", "B", "C", "D" };//, "E", "F", "G", "H"
 
 	std::string Output = "";
 
@@ -227,10 +239,206 @@ std::string GetExpressionFromGroup(unsigned int* Array, unsigned int size, unsig
 
 }
 
+class SOP_INPUT {
+
+public:
+
+	std::vector<unsigned int> vArray;
+	unsigned int BitsRequired = 0;
+
+	/// <summary>
+	/// Can Be Optimized
+	/// Debug Mode Time Taken for 0 - 65536 => 203ms
+	/// Release Mode Time Taken for 0 - 65536 => 14ms
+	/// </summary>
+	/// <param name="">Send Unsigned Integer As Input But It Only Takes Into Account 31 Bits</param>
+	/// <returns></returns>
+	static std::string convertIntoBinaryString(unsigned int Number) {
+
+		std::string Output = "";
+
+		for (unsigned int i = 1; i < 31; i++) {
+
+			((Number >> (30 - i)) & 1) ? Output += '1' : Output += '0';
+
+		}
+
+		unsigned int Index = 0;
+
+		//Minimize
+		while (Output[Index] == '0' && !(Index > Output.size())) {
+
+			Index++;
+
+		}
+
+		std::string Temp = "";
+
+		for (unsigned int i = Index; i < Output.size(); i++) {
+
+			Temp += Output[i];
+
+		}
+
+		Output = Temp;
+
+		if (Output.size() == 0) {
+
+			Output = "0";
+
+		}
+
+		return Output;
+
+	}
+
+	static bool isANumber(char Character) {
+
+		if (Character >= '0' && Character <= '9') {
+
+			return true;
+
+		}
+
+		return false;
+
+	}
+
+	//Checks Are Not Perfomed
+	static unsigned int convertIntoNumber(std::string Characters) {
+
+		unsigned int Size = Characters.size();
+
+		if (Size > 9) {
+
+			return UINT32_MAX;
+
+		}
+
+		unsigned int Number = 0;
+
+		for (unsigned int Index = 0; Index < Size; Index++) {
+
+			Number += static_cast<unsigned int>(pow(10, (Size - Index - 1))) * (Characters[Index] - '0');
+
+		}
+
+		return Number;
+
+	}
+
+	unsigned int GetLargestInteger(std::vector<unsigned int> Input) {
+
+		unsigned int LargestNumber = 0;
+
+		for (unsigned int Index = 0; Index < Input.size(); Index++) {
+
+			if (Input[Index] > LargestNumber) {
+
+				LargestNumber = Input[Index];
+
+			}
+
+		}
+
+		return LargestNumber;
+
+	}
+
+	std::vector<unsigned int>GetNumberArray(std::string Expression, unsigned int& BitsRequired) {
+
+		std::vector<unsigned int>Output;
+
+		std::vector<std::string>StringArray;
+
+		std::string Temporary = "";
+
+		for (unsigned int Index = 0; Index < Expression.size(); Index++) {
+
+			if (SOP_INPUT::isANumber(Expression[Index])) {
+
+				Temporary += Expression[Index];
+
+			}
+			else if (Expression[Index] == ',') {
+
+				StringArray.push_back(Temporary);
+				Temporary = "";
+
+			}
+
+		}
+
+		StringArray.push_back(Temporary);
+
+		for (unsigned int Index = 0; Index < StringArray.size(); Index++) {
+
+			Output.push_back(SOP_INPUT::convertIntoNumber(StringArray[Index]));
+
+		}
+
+		unsigned int LargestNumber = GetLargestInteger(Output);
+
+		BitsRequired = convertIntoBinaryString(LargestNumber).size();
+
+		return Output;
+
+	}
+
+
+	SOP_INPUT(std::string Input = "") {
+
+		if (Input == "") {
+
+			LogError("No Input Provided");
+
+			::exit(-1);
+
+		}
+
+		vArray = GetNumberArray(Input, BitsRequired);
+
+	}
+
+	unsigned int* GetBooleanArray() {
+
+		unsigned int Size = pow(2, BitsRequired);
+
+		unsigned int* Output = new unsigned int[Size];
+		memset(Output, 0, Size);
+
+		for (unsigned int Index = 0; Index < Size; Index++) {
+
+			for (unsigned int vArrayIndex = 0; vArrayIndex < vArray.size(); vArrayIndex++) {
+
+				if (Index == vArray[vArrayIndex]) {
+
+					Output[Index] = 1;
+
+				}
+
+			}
+
+			if (Output[Index] > 1) {
+
+				Output[Index] = 0;
+
+			}
+
+		}
+
+		return Output;
+
+	}
+
+};
+
 
 class TRUTH_TABLE {
 
 public:
+
+	enum Directions { NONE, UP, DOWN, LEFT, RIGHT };
 
 	unsigned int** DataArray = nullptr;
 
@@ -257,45 +465,91 @@ public:
 
 		size = x * y;
 
-		DataArray = new unsigned int* [y];
+		DataArray = new unsigned int* [x];
 
-		for (unsigned int Index = 0; Index < y; Index++) {
+		for (unsigned int Index = 0; Index < x; Index++) {
 
-			DataArray[Index] = new unsigned int[x];
+			DataArray[Index] = new unsigned int[y];
+			memset(DataArray[Index], 0, y);
 
 		}
 
-		for (unsigned int i = 0; i < y; i++) {
+		for (unsigned int i = 0; i < x; i++) {
 
-			for (unsigned int j = 0; j < x; i++) {
+			for (unsigned int j = 0; j < y; j++) {
 
-				DataArray[i][j] = Array[i * x + j];
+#pragma warning( push )
+#pragma warning( disable : 4101)
+				//Optimize !-No Need To Call getEquivalentGrayCode every time
+				DataArray[getEquivalentGrayCode(i)][getEquivalentGrayCode(j)] = Array[i * y + j];
+
+#pragma warning( pop ) 
 
 			}
 
 		}
 
+	}
+
+	Directions check(unsigned int X, unsigned int Y, std::vector<unsigned int>ones) {
+
+		Directions Output = NONE;
+
+		for (unsigned int i = 1; i < 5; i++) {
+
+			
+
+		}
+
+		return Output;
+	}
+
+	std::vector<unsigned int> vGetOnes() {
+
+		std::vector<unsigned int>Output;
+
+		for (unsigned int i = 0; i < x; i++) {
+
+			for (unsigned int j = 0; j < y; j++) {
+
+				if (DataArray[i][j]) {
+
+					Output.push_back(i * y + j);
+
+				}
+
+			}
+
+		}
+
+		return Output;
 
 	}
 
 
+	std::vector<std::vector<unsigned int>> vGetGroups() {
 
+		std::vector<std::vector<unsigned int>>Output;
 
-	std::vector<std::vector<int>> vGetGroups() {
+		std::vector<unsigned int>temp = vGetOnes();
 
+		for (unsigned int i = 0; i < size; i++) {
 
+			check((unsigned int)floor((float)i / y), i % y, temp);
+
+		}
+
+		return Output;
 
 	}
 
-	friend std::ostream& operator<< (std::ostream& stream, TRUTH_TABLE Table) {
-
-		stream << "\n\tThe Table Is:\n";
+	friend std::ostream& operator<< (std::ostream& stream, TRUTH_TABLE& Table) {
 
 		for (unsigned int i = 0; i < Table.x; i++) {
 
-			for (unsigned int j = 0; j < Table.y; i++) {
+			for (unsigned int j = 0; j < Table.y; j++) {
 
-				stream << Table.DataArray[i][j] << "\t";
+				stream << "\t[" << i << "][" << j << "]:" << Table.DataArray[i][j] << "\t";
 
 			}
 
@@ -309,22 +563,42 @@ public:
 
 	~TRUTH_TABLE() {
 
-		for (unsigned int Index = 0; Index < y; Index++) {
+		for (unsigned int Index = 0; Index < x; Index++) {
 
 			delete[] DataArray[Index];
 
 		}
 
-		delete[] DataArray;
+		delete DataArray;
 
 	}
 
 };
 
+
 int main() {
 
-	unsigned int arr[] = { 0, 1,2,3 };
+	SOP_INPUT Input = SOP_INPUT("{ 1, 7};");
 
-	std::cout << "Expression is : " << GetExpressionFromGroup(arr, sizeof(arr)/4, 4);
+#ifdef DEBUG
+	std::cout << "\nInputs Required:\t" << Input.BitsRequired;
+	std::cout << "\nSize of array:\t" << Input.vArray.size();
+
+	for (unsigned int i = 0; i < Input.vArray.size(); i++) {
+
+		std::cout << "\n\tIndex [" << i << "] :\t" << Input.vArray[i];
+
+	}
+#endif
+
+	TRUTH_TABLE Table = TRUTH_TABLE(Input.GetBooleanArray(), Input.BitsRequired);
+
+	std::cout << Table;
+
+	std::cout << "\n";
+
+	std::vector<std::vector<unsigned int>> vArray = Table.vGetGroups();
+
+	
 
 }
