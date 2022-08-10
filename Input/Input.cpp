@@ -200,7 +200,7 @@ std::string GetExpressionFromGroup(unsigned int* Array, unsigned int size, unsig
 
 	}
 #endif
-	std::string digits[4] = { "A", "B", "C", "D"};
+	std::string digits[8] = { "A", "B", "C", "D" , "E", "F", "G", "H"};
 
 	std::string Output = "";
 
@@ -232,23 +232,49 @@ class TRUTH_TABLE {
 
 public:
 
-	unsigned int* DataArray = nullptr;
+	unsigned int** DataArray = nullptr;
 
 	unsigned int NumberOfBits = 0;
 
-	unsigned int x = 0, y = 0;
+	unsigned int x = 0, y = 0, size = 0;
 
 	TRUTH_TABLE(unsigned int* Array, unsigned int NumberOfInputs) {
-
-		DataArray = Array;
 
 		NumberOfBits = NumberOfInputs;
 
 		if (NumberOfBits & 1) {
 
-
+			x = pow(2, (NumberOfBits + 1)/2);
+			y = pow(2, (NumberOfBits - 1)/2);
 
 		}
+		else {
+
+			x = pow(2, NumberOfBits / 2);
+			y = pow(2, NumberOfBits / 2);
+
+		}
+
+		size = x * y;
+
+		DataArray = new unsigned int* [y];
+
+		for (unsigned int Index = 0; Index < y; Index++) {
+
+			DataArray[Index] = new unsigned int[x];
+
+		}
+
+		for (unsigned int i = 0; i < y; i++) {
+
+			for (unsigned int j = 0; j < x; i++) {
+
+				DataArray[i][j] = Array[i * x + j];
+
+			}
+
+		}
+
 
 	}
 
@@ -258,6 +284,38 @@ public:
 	std::vector<std::vector<int>> vGetGroups() {
 
 
+
+	}
+
+	friend std::ostream& operator<< (std::ostream& stream, TRUTH_TABLE Table) {
+
+		stream << "\n\tThe Table Is:\n";
+
+		for (unsigned int i = 0; i < Table.x; i++) {
+
+			for (unsigned int j = 0; j < Table.y; i++) {
+
+				stream << Table.DataArray[i][j] << "\t";
+
+			}
+
+			stream << "\n";
+
+		}
+
+		return stream;
+
+	}
+
+	~TRUTH_TABLE() {
+
+		for (unsigned int Index = 0; Index < y; Index++) {
+
+			delete[] DataArray[Index];
+
+		}
+
+		delete[] DataArray;
 
 	}
 
