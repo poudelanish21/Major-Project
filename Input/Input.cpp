@@ -227,7 +227,7 @@ std::string GetExpressionFromGroup(unsigned int* Array, unsigned int size, unsig
 			}
 			else {
 
-				Output += (std::string("!(") + std::string(digits[i]) + ")");
+				Output += (std::string("!") + std::string(digits[i]) + "");
 
 			}
 
@@ -452,14 +452,14 @@ public:
 
 		if (NumberOfBits & 1) {
 
-			x = pow(2, (NumberOfBits + 1)/2);
-			y = pow(2, (NumberOfBits - 1)/2);
+			x = static_cast<unsigned int>(pow(2, (NumberOfBits + 1)/2));
+			y = static_cast<unsigned int>(pow(2, (NumberOfBits - 1)/2));
 
 		}
 		else {
 
-			x = pow(2, NumberOfBits / 2);
-			y = pow(2, NumberOfBits / 2);
+			x = static_cast<unsigned int>(pow(2, NumberOfBits / 2));
+			y = static_cast<unsigned int>(pow(2, NumberOfBits / 2));
 
 		}
 
@@ -570,6 +570,72 @@ public:
 		}
 
 		delete DataArray;
+
+	}
+
+};
+
+class Groups {
+
+public:
+
+	std::vector<std::vector<unsigned int>>GroupArray;
+
+	//Set Vector
+	Groups(std::vector<std::vector<unsigned int>>InputVector) {
+
+		GroupArray = InputVector;
+
+	}
+
+	unsigned int ReduceGroups() {
+
+		unsigned int Output = GroupArray.size();
+
+		bool fullyMatched = true;
+
+		std::vector<std::vector<unsigned int>>TempArray;
+
+		for (unsigned int i = 0; i < GroupArray.size(); i++) {
+
+			fullyMatched = true;
+
+			for (unsigned int j = 0; j < GroupArray[i].size(); j++) {
+
+				for (unsigned int k = 0; k < GroupArray.size(); k++) {
+				
+					if (i != k) {
+
+						if (GroupArray[i][j] != GroupArray[k][j]) {
+
+							fullyMatched = false;
+
+						}
+
+					}
+				
+				}
+
+			}
+
+			if (!fullyMatched) {
+
+				TempArray.push_back(GroupArray[i]);
+
+			}
+			else {
+
+				Output--;
+
+			}
+
+		}
+
+		Output = GroupArray.size() - Output;
+
+		GroupArray = TempArray;
+
+		return Output;
 
 	}
 
