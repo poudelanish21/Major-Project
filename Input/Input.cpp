@@ -5,9 +5,9 @@
 #include <bitset>
 #include <typeinfo>
 #include <algorithm>
-
 using namespace std;
-
+int d = 4;
+int no = 3;
 void LogError(std::string Msg) {
 
 	std::cout << Msg << "\n";
@@ -27,42 +27,86 @@ public:
 	cell(int temp)
 	{
 
-		x = temp / 4;//should pass the y index later
-		y = temp % 4;
-		string str = "";
-		str = bitset<4>(temp).to_string(); // this is the binary index of the current cell in 4 bits
-		bitset<4> b1(str);
+		x = temp / d;//should pass the y index later
+		y = temp % d;
+
+		string str3 = "";
+		str3 = bitset<3>(temp).to_string();
+		bitset<3> b31(str3);
+		bitset<3> b32(b31);
+		bitset<3> b33(b31);
+		bitset<3> b34(b31);
+		bitset<3> b35(b31);
+
+		string str4 = "";
+		str4 = bitset<4>(temp).to_string(); // this is the binary index of the current cell in 4 bits
+		bitset<4> b1(str4);
 		// now calculate the index of the next cell
 		bitset<4> b2(b1);
 		bitset<4> b3(b1);
 		bitset<4> b4(b1);
 		bitset<4> b5(b1);
 
-		if ((b1[0] ^ b1[1]) == 0)
-		{
+		switch (no) {
+		case 2:
+			break;
+		case 3:
+			if ((b1[0] ^ b1[1]) == 0)
+			{
+				b32.flip(0);
+				b33.flip(1);
+			}
+			else
+			{
+				b32.flip(1);
+				b33.flip(0);
+			}
+				b34.flip(2);
+				b35.flip(2);
+			br = (int)(b32.to_ulong());
+			bl = (int)(b33.to_ulong());
+			bd = (int)(b34.to_ulong());
+			bu = (int)(b35.to_ulong());
+			break;
+		case 4:	
+			if ((b1[0] ^ b1[1]) == 0)
+			{
 			b2.flip(0);
 			b3.flip(1);
-		}
-		else
-		{
+			}
+			  else
+			{
 			b2.flip(1);
 			b3.flip(0);
+			}
+			if ((b1[2] ^ b1[3]) == 0)
+			  {
+				  b4.flip(2);
+				  b5.flip(3);
+			  }
+			else
+			  {
+				  b4.flip(3);
+				  b5.flip(2);
+			  }
+			br = (int)(b2.to_ulong());
+			bl = (int)(b3.to_ulong());
+			bd = (int)(b4.to_ulong());
+			bu = (int)(b5.to_ulong());
+			break;
+		case 5:
+			break;
+		case 6:
+			break;
+		case 7:
+			break;
+		case 8:
+			break;
 		}
-		if ((b1[2] ^ b1[3]) == 0)
-		{
-			b4.flip(2);
-			b5.flip(3);
-		}
-		else
-		{
-			b4.flip(3);
-			b5.flip(2);
-		}
+		
+		
 
-		br = (int)(b2.to_ulong());
-		bl = (int)(b3.to_ulong());
-		bd = (int)(b4.to_ulong());
-		bu = (int)(b5.to_ulong());
+		
 	}
 
 
@@ -362,7 +406,7 @@ int main(int argc, char** argw) {
 
 	unsigned int BitsRequired = 0;
 
-	SOP_INPUT Obj = SOP_INPUT("{0,1,2,3,6,8,11,12};");
+	SOP_INPUT Obj = SOP_INPUT("{0,1,4,5,7};");
 
 	unsigned int* Output = Obj.GetBooleanArray();
 
@@ -448,6 +492,7 @@ int main(int argc, char** argw) {
 	int m = 0, n = 0;
 	int s = x * y;
 	int count = 0;
+	d = y;
 	vector<vector<unsigned int>>grp;
 	vector<unsigned int> group1;
 	vector<unsigned int> group2;
@@ -509,7 +554,7 @@ int main(int argc, char** argw) {
 						temp_1 = cright->x * y + cright->y;
 						temp_count++;
 						tcright++;
-						group1.push_back(temp_1);
+						group1.push_back(temp_1); 
 						cll = new cell(temp_1);
 
 						cright = new cell(cll->br);
@@ -522,7 +567,7 @@ int main(int argc, char** argw) {
 							temp_left = cleft->x * y + cleft->y;
 							temp_count++;
 							tcleft++;
-							group1.push_back(temp_left);
+							group1.push_back(temp_left); 
 							cll = new cell(temp_left);
 
 							cleft = new cell(cll->bl);
@@ -548,7 +593,8 @@ int main(int argc, char** argw) {
 					}
 					for (int i = 0; i < poptemp; i++)
 					{
-						group1.pop_back();
+						group1.pop_back(); 
+						temp_count--;
 					}
 					cll = new cell(centralindex);
 
@@ -563,7 +609,7 @@ int main(int argc, char** argw) {
 					int dtcleft = 0;
 					int end = 0;
 
-					while (Matrixx[q][r] == 1 && temp_count_row != x && end == 0)
+					while (Matrixx[q][r] == 1 && temp_count_row != y && end == 0)
 					{
 
 
@@ -571,7 +617,7 @@ int main(int argc, char** argw) {
 						{
 
 							tempt = cll->bd;
-							group1.push_back(tempt);
+							group1.push_back(tempt); 
 							int temp_count_check = 1;
 							cll = new cell(cll->bd);
 							cright = new cell(cll->br);
@@ -585,14 +631,14 @@ int main(int argc, char** argw) {
 								temp_1 = cright->x * y + cright->y;
 								temp_count_check++;
 								dtcright++;
-								group1.push_back(temp_1);
+								group1.push_back(temp_1); 
 								cll = new cell(temp_1);
 
 								cright = new cell(cll->br);
 							}
-							if (Matrixx[cleft->x][cleft->y] == 1) {
-								temp_count_check = 1;
-
+							if (Matrixx[cleft->x][cleft->y] == 1 && tcleft!=0) {
+								
+									temp_count_check = 1;
 
 								while (temp_count_check != temp_count && Matrixx[cleft->x][cleft->y] == 1 && dtcleft != tcleft)
 								{
@@ -600,13 +646,12 @@ int main(int argc, char** argw) {
 
 									temp_count_check++;
 									dtcleft++;
-									group1.push_back(temp_left);
+									group1.push_back(temp_left); 
 									cll = new cell(temp_left);
 
 									cleft = new cell(cll->bl);
 								}
 							}
-
 							if (temp_count_check != temp_count)
 							{
 								for (int i = 0; i < temp_count_check; i++)
@@ -646,14 +691,14 @@ int main(int argc, char** argw) {
 						temp_count_row = 1;
 
 
-						while (Matrixx[q][r] == 1 && temp_count_row != x && endup == 0)
+						while (Matrixx[q][r] == 1 && temp_count_row != y && endup == 0)
 						{
 
 
 							if (Matrixx[q][r] == 1)
 							{
 								tempq = cll->bu;
-								group1.push_back(tempq);
+								group1.push_back(tempq); 
 								int temp_count_check = 1;
 								cll = new cell(cll->bu);
 								cright = new cell(cll->br);
@@ -668,12 +713,12 @@ int main(int argc, char** argw) {
 
 									temp_count_check++;
 									ucright++;
-									group1.push_back(temp_1);
+									group1.push_back(temp_1); 
 									cll = new cell(temp_1);
 
 									cright = new cell(cll->br);
 								}
-								if (Matrixx[cleft->x][cleft->y] == 1) {
+								if (Matrixx[cleft->x][cleft->y] == 1 && tcleft != 0) {
 									temp_count_check = 1;
 
 									while (temp_count_check != temp_count && Matrixx[cleft->x][cleft->y] == 1 && ucleft != tcleft)
@@ -681,7 +726,7 @@ int main(int argc, char** argw) {
 										temp_left = cleft->x * y + cleft->y;
 										temp_count_check++;
 										ucleft++;
-										group1.push_back(temp_left);
+										group1.push_back(temp_left); 
 										cll = new cell(temp_left);
 
 										cleft = new cell(cll->bl);
@@ -754,27 +799,26 @@ int main(int argc, char** argw) {
 
 
 					cdown = new cell(cll->bd);
-					cup = new cell(cll->bu);//*****
+					cup = new cell(cll->bu);
 					int temp_1 = cdown->x * y + cdown->y;
 					int temp_up = cup->x * y + cup->y;//*****
-
-					while (temp_1 != temp && Matrixx[cdown->x][cdown->y] == 1)
+					while (temp_1 != temp && Matrixx[cdown->x][cdown->y] == 1)//end should be added
 					{
 
-						temp_1 = cdown->x * y + cdown->y;
 						temp_count2++;
 						tcdown++;
 						group2.push_back(temp_1);
 						cll = new cell(temp_1);
 
 						cdown = new cell(cll->bd);
+						temp_1 = cdown->x * y + cdown->y;
+
 					}
 					if (temp_1 != temp)
 					{
 						while (temp_up != temp && Matrixx[cup->x][cup->y] == 1)
 						{
 
-							temp_up = cup->x * y + cup->y;
 							temp_count2++;
 							tcup++;
 							group2.push_back(temp_up);
@@ -782,6 +826,8 @@ int main(int argc, char** argw) {
 							cll = new cell(temp_up);
 
 							cup = new cell(cll->bu);
+							temp_up = cup->x * y + cup->y;
+
 						}
 					}
 
@@ -828,7 +874,6 @@ int main(int argc, char** argw) {
 
 							tempt = cll->br;
 							group2.push_back(tempt);
-							cout << tempt << "pushed\n";
 							int temp_count_check = 1;
 							cll = new cell(cll->br);
 							cdown = new cell(cll->bd);
@@ -839,28 +884,30 @@ int main(int argc, char** argw) {
 							while (temp_count_check != temp_count2 && Matrixx[cdown->x][cdown->y] == 1 && dtcdown != tcdown)
 							{
 
-								temp_1 = cdown->x * y + cdown->y;
 								temp_count_check++;
 								dtcdown++;
-								group2.push_back(temp_1);
+								group2.push_back(temp_1); 
 								cll = new cell(temp_1);
 
 								cdown = new cell(cll->bd);
+								temp_1 = cdown->x * y + cdown->y;
+
 							}
-							if (Matrixx[cup->x][cup->y] == 1) {
+							if (Matrixx[cup->x][cup->y] == 1 && tcup!=0) {
 								temp_count_check = 1;
 
 
 								while (temp_count_check != temp_count2 && Matrixx[cup->x][cup->y] == 1 && dtcup != tcup)
 								{
-									temp_up = cup->x * y + cup->y;
 
 									temp_count_check++;
 									dtcup++;
-									group2.push_back(temp_up);
+									group2.push_back(temp_up); 
 									cll = new cell(temp_up);
 
 									cup = new cell(cll->bu);
+									temp_up = cup->x * y + cup->y;
+
 								}
 							}
 
@@ -909,8 +956,8 @@ int main(int argc, char** argw) {
 
 							if (Matrixx[q][r] == 1)
 							{
-								tempt = cll->bl;
-								group2.push_back(tempq);
+								tempq = cll->bl;
+								group2.push_back(tempq); 
 								int temp_count_check = 1;
 								cll = new cell(cll->bl);
 								cdown = new cell(cll->bd);
@@ -921,27 +968,29 @@ int main(int argc, char** argw) {
 								while (temp_count_check != temp_count2 && Matrixx[cdown->x][cdown->y] == 1 && ucdown != tcdown)
 								{
 
-									temp_1 = cdown->x * y + cdown->y;
 
 									temp_count_check++;
 									ucdown++;
-									group2.push_back(temp_1);
+									group2.push_back(temp_1); 
 									cll = new cell(temp_1);
 
 									cdown = new cell(cll->bd);
+									temp_1 = cdown->x * y + cdown->y;
+
 								}
-								if (Matrixx[cup->x][cup->y] == 1) {
+								if (Matrixx[cup->x][cup->y] == 1 && tcup != 0) {
 									temp_count_check = 1;
 
 									while (temp_count_check != temp_count2 && Matrixx[cup->x][cup->y] == 1 && ucup != tcup)
 									{
-										temp_up = cup->x * y + cup->y;
 										temp_count_check++;
 										ucup++;
-										group2.push_back(temp_up);
+										group2.push_back(temp_up); 
 										cll = new cell(temp_up);
 
 										cup = new cell(cll->bu);
+										temp_up = cup->x * y + cup->y;
+
 									}
 								}
 
@@ -958,6 +1007,7 @@ int main(int argc, char** argw) {
 								{
 									temp_count_row++;
 									count_total_row++;
+
 								}
 								cll = new cell(tempq);
 
