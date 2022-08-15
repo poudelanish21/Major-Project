@@ -666,7 +666,7 @@ public:
 
 		}
 
-		Output = 0;
+		Output = GroupArray.size() - TempArray.size();
 
 		GroupArray = TempArray;
 
