@@ -1095,6 +1095,5 @@ int main(int argc, char** argw) {
 		delete[] Matrixx[i];
 
 	}
-	//nub niranjan
 
 }
