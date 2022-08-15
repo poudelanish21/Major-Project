@@ -628,7 +628,7 @@ public:
 
 				for (unsigned int k = 0; k < GroupArray[i].size(); k++) {
 				
-					if (i != k) {
+					if (i != j) {
 
 						if (matched(GroupArray[i][k], GroupArray[j])) {
 
@@ -648,6 +648,8 @@ public:
 
 		for (unsigned int i = 0; i < Output; i++) {
 
+			fullyMatched = true;
+
 			for (unsigned int j = 0; j < GroupArray[i].size(); j++) {
 
 				if (!Matched[i][j]) {
@@ -666,9 +668,19 @@ public:
 
 		}
 
+		for (unsigned int i = 0; i < Output; i++) {
+
+			delete[] Matched[i];
+
+		}
+
+		delete[] Matched;
+
 		Output = GroupArray.size() - TempArray.size();
 
 		GroupArray = TempArray;
+
+
 
 		return Output;
 
