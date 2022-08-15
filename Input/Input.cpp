@@ -644,7 +644,7 @@ public:
 
 int main() {
 
-	SOP_INPUT Input = SOP_INPUT("{ 1, 7};");
+	SOP_INPUT Input = SOP_INPUT("{};");
 
 #ifdef DEBUG
 	std::cout << "\nInputs Required:\t" << Input.BitsRequired;
@@ -655,6 +655,7 @@ int main() {
 		std::cout << "\n\tIndex [" << i << "] :\t" << Input.vArray[i];
 
 	}
+	std::cout << "\n";
 #endif
 
 	TRUTH_TABLE Table = TRUTH_TABLE(Input.GetBooleanArray(), Input.BitsRequired);
