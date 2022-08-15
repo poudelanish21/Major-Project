@@ -588,27 +588,51 @@ public:
 
 	}
 
+	bool matched(unsigned int Item, std::vector<unsigned int>Array) {
+
+		unsigned int Size = Array.size();
+
+		for (unsigned int i = 0; i < Size; i++) {
+
+			if (Item == Array[i]) {
+
+				return false;
+
+			}
+
+		}
+
+		return true;
+
+	}
+
 	unsigned int ReduceGroups() {
 
 		unsigned int Output = GroupArray.size();
 
-		bool fullyMatched = true;
+		bool** Matched = new bool* [Output];
+
+		for (unsigned int i = 0; i < Output; i++) {
+		
+			Matched[i] = new bool[GroupArray[i].size()];
+			memset(Matched[i], 0, GroupArray[i].size());
+		
+		}
 
 		std::vector<std::vector<unsigned int>>TempArray;
 
-		for (unsigned int i = 0; i < GroupArray.size(); i++) {
+		for (unsigned int i = 0; i < Output; i++) {
 
-			fullyMatched = true;
 
-			for (unsigned int j = 0; j < GroupArray[i].size(); j++) {
+			for (unsigned int j = 0; j < Output; j++) {
 
-				for (unsigned int k = 0; k < GroupArray.size(); k++) {
+				for (unsigned int k = 0; k < GroupArray[i].size(); k++) {
 				
 					if (i != k) {
 
-						if (GroupArray[i][j] != GroupArray[k][j]) {
+						if (matched(GroupArray[i][k], GroupArray[j])) {
 
-							fullyMatched = false;
+							Matched[i][k] = 1;
 
 						}
 
@@ -618,20 +642,31 @@ public:
 
 			}
 
+		}
+
+		bool fullyMatched = true;
+
+		for (unsigned int i = 0; i < Output; i++) {
+
+			for (unsigned int j = 0; j < GroupArray[i].size(); j++) {
+
+				if (!Matched[i][j]) {
+
+					fullyMatched = false;
+
+				}
+
+			}
+
 			if (!fullyMatched) {
 
 				TempArray.push_back(GroupArray[i]);
 
 			}
-			else {
-
-				Output--;
-
-			}
 
 		}
 
-		Output = GroupArray.size() - Output;
+		Output = 0;
 
 		GroupArray = TempArray;
 
