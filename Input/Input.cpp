@@ -7,7 +7,7 @@
 #include <algorithm>
 using namespace std;
 int d = 4;
-int no = 3;
+int no = 4;
 void LogError(std::string Msg) {
 
 	std::cout << Msg << "\n";
@@ -19,11 +19,20 @@ unsigned int BinaryToGrayCode(unsigned int Binary) {
 	return ((Binary >> 1) ^ Binary);
 
 }
+unsigned int grayToBinary(unsigned int num)
+{
+	unsigned int mask;
+	for (mask = num >> 1; mask != 0; mask = mask >> 1)
+	{
+		num = num ^ mask;
+	}
+	return num;
+}
 
 class cell
 {
 public:
-	int bl, br, bd, bu, x, y;
+	int bl, br, bd, bu, x, y,k,l,u;
 	cell(int temp)
 	{
 
@@ -47,11 +56,19 @@ public:
 		bitset<4> b4(b1);
 		bitset<4> b5(b1);
 
+		string str5 = "";
+		str5 = bitset<5>(temp).to_string();
+		bitset<5> b51(str5);
+		bitset<5> b52(b51);
+		bitset<5> b53(b51);
+		bitset<5> b54(b51);
+		bitset<5> b55(b51);
+
 		switch (no) {
 		case 2:
 			break;
 		case 3:
-			if ((b1[0] ^ b1[1]) == 0)
+			if ((b31[0] ^ b31[1]) == 0)
 			{
 				b32.flip(0);
 				b33.flip(1);
@@ -61,40 +78,63 @@ public:
 				b32.flip(1);
 				b33.flip(0);
 			}
-				b34.flip(2);
-				b35.flip(2);
+			b34.flip(2);
+			b35.flip(2);
 			br = (int)(b32.to_ulong());
 			bl = (int)(b33.to_ulong());
 			bd = (int)(b34.to_ulong());
 			bu = (int)(b35.to_ulong());
 			break;
-		case 4:	
+		case 4:
 			if ((b1[0] ^ b1[1]) == 0)
 			{
-			b2.flip(0);
-			b3.flip(1);
+				b2.flip(0);
+				b3.flip(1);
 			}
-			  else
+			else
 			{
-			b2.flip(1);
-			b3.flip(0);
+				b2.flip(1);
+				b3.flip(0);
 			}
 			if ((b1[2] ^ b1[3]) == 0)
-			  {
-				  b4.flip(2);
-				  b5.flip(3);
-			  }
+			{
+				b4.flip(2);
+				b5.flip(3);
+			}
 			else
-			  {
-				  b4.flip(3);
-				  b5.flip(2);
-			  }
+			{
+				b4.flip(3);
+				b5.flip(2);
+			}
 			br = (int)(b2.to_ulong());
 			bl = (int)(b3.to_ulong());
 			bd = (int)(b4.to_ulong());
 			bu = (int)(b5.to_ulong());
 			break;
 		case 5:
+			if ((b51[0] ^ b51[1]) == 0)
+			{
+				b52.flip(0);
+				b53.flip(1);
+			}
+			else
+			{
+				b52.flip(1);
+				b53.flip(0);
+			}
+			br = (int)(b52.to_ulong());
+			bl = (int)(b53.to_ulong());
+			cout << "\ntemp: " << temp;
+			 k = grayToBinary(temp);
+			 cout << "\nk: " << k;
+			 l = k + 4;
+			 u = k - 4;
+			 cout << "\nl: " << l;
+			 cout << "\nu: " << u;
+
+			bd = BinaryToGrayCode(l);
+			bu = BinaryToGrayCode(u);
+			cout << "\n" << bd << "and" << bu << "\n";
 			break;
 		case 6:
 			break;
@@ -103,10 +143,10 @@ public:
 		case 8:
 			break;
 		}
-		
-		
 
-		
+
+
+
 	}
 
 
@@ -129,15 +169,7 @@ unsigned int binaryToGray(unsigned int num)
 	return (num >> 1) ^ num;
 }
 
-unsigned int grayToBinary(unsigned int num)
-{
-	unsigned int mask;
-	for (mask = num >> 1; mask != 0; mask = mask >> 1)
-	{
-		num = num ^ mask;
-	}
-	return num;
-}
+
 
 class CanonicalForm {
 
@@ -401,13 +433,126 @@ public:
 	}
 
 };
+class Groups {
+
+public:
+
+	std::vector<std::vector<unsigned int>>GroupArray;
+
+	//Set Vector
+	Groups(std::vector<std::vector<unsigned int>>InputVector) {
+
+		GroupArray = InputVector;
+
+	}
+
+	bool matched(unsigned int Item, std::vector<unsigned int>Array) {
+
+		unsigned int Size = Array.size();
+
+		for (unsigned int i = 0; i < Size; i++) {
+
+			if (Item == Array[i]) {
+
+				return true;
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	unsigned int ReduceGroups() {
+
+		unsigned int Output = GroupArray.size();
+
+		bool** Matched = new bool* [Output];
+
+		for (unsigned int i = 0; i < Output; i++) {
+
+			Matched[i] = new bool[GroupArray[i].size()];
+			memset(Matched[i], 0, GroupArray[i].size());
+
+		}
+
+		std::vector<std::vector<unsigned int>>TempArray;
+
+		for (unsigned int i = 0; i < Output; i++) {
+
+
+			for (unsigned int j = 0; j < Output; j++) {
+
+				for (unsigned int k = 0; k < GroupArray[i].size(); k++) {
+
+					if (i != j) {
+
+						if (matched(GroupArray[i][k], GroupArray[j])) {
+
+							Matched[i][k] = 1;
+
+						}
+
+					}
+
+				}
+
+			}
+
+		}
+
+		bool fullyMatched = true;
+
+		for (unsigned int i = 0; i < Output; i++) {
+
+			fullyMatched = true;
+
+			for (unsigned int j = 0; j < GroupArray[i].size(); j++) {
+
+				if (!Matched[i][j]) {
+
+					fullyMatched = false;
+
+				}
+
+			}
+
+			if (!fullyMatched) {
+
+				TempArray.push_back(GroupArray[i]);
+
+			}
+
+		}
+
+		for (unsigned int i = 0; i < Output; i++) {
+
+			delete[] Matched[i];
+
+		}
+
+		delete[] Matched;
+
+		Output = GroupArray.size() - TempArray.size();
+
+		GroupArray = TempArray;
+
+
+
+		return Output;
+
+	}
+
+};
+
 
 int main(int argc, char** argw) {
 
 	unsigned int BitsRequired = 0;
 
-	SOP_INPUT Obj = SOP_INPUT("{0,1,4,5,7};");
-
+	SOP_INPUT Obj = SOP_INPUT("{25};");
+	
 	unsigned int* Output = Obj.GetBooleanArray();
 
 
@@ -493,6 +638,7 @@ int main(int argc, char** argw) {
 	int s = x * y;
 	int count = 0;
 	d = y;
+	no = Obj.BitsRequired;
 	vector<vector<unsigned int>>grp;
 	vector<unsigned int> group1;
 	vector<unsigned int> group2;
@@ -554,7 +700,7 @@ int main(int argc, char** argw) {
 						temp_1 = cright->x * y + cright->y;
 						temp_count++;
 						tcright++;
-						group1.push_back(temp_1); 
+						group1.push_back(temp_1);
 						cll = new cell(temp_1);
 
 						cright = new cell(cll->br);
@@ -567,7 +713,7 @@ int main(int argc, char** argw) {
 							temp_left = cleft->x * y + cleft->y;
 							temp_count++;
 							tcleft++;
-							group1.push_back(temp_left); 
+							group1.push_back(temp_left);
 							cll = new cell(temp_left);
 
 							cleft = new cell(cll->bl);
@@ -593,7 +739,7 @@ int main(int argc, char** argw) {
 					}
 					for (int i = 0; i < poptemp; i++)
 					{
-						group1.pop_back(); 
+						group1.pop_back();
 						temp_count--;
 					}
 					cll = new cell(centralindex);
@@ -617,7 +763,7 @@ int main(int argc, char** argw) {
 						{
 
 							tempt = cll->bd;
-							group1.push_back(tempt); 
+							group1.push_back(tempt);
 							int temp_count_check = 1;
 							cll = new cell(cll->bd);
 							cright = new cell(cll->br);
@@ -631,14 +777,14 @@ int main(int argc, char** argw) {
 								temp_1 = cright->x * y + cright->y;
 								temp_count_check++;
 								dtcright++;
-								group1.push_back(temp_1); 
+								group1.push_back(temp_1);
 								cll = new cell(temp_1);
 
 								cright = new cell(cll->br);
 							}
-							if (Matrixx[cleft->x][cleft->y] == 1 && tcleft!=0) {
-								
-									temp_count_check = 1;
+							if (Matrixx[cleft->x][cleft->y] == 1 && tcleft != 0) {
+
+								temp_count_check = 1;
 
 								while (temp_count_check != temp_count && Matrixx[cleft->x][cleft->y] == 1 && dtcleft != tcleft)
 								{
@@ -646,7 +792,7 @@ int main(int argc, char** argw) {
 
 									temp_count_check++;
 									dtcleft++;
-									group1.push_back(temp_left); 
+									group1.push_back(temp_left);
 									cll = new cell(temp_left);
 
 									cleft = new cell(cll->bl);
@@ -698,7 +844,7 @@ int main(int argc, char** argw) {
 							if (Matrixx[q][r] == 1)
 							{
 								tempq = cll->bu;
-								group1.push_back(tempq); 
+								group1.push_back(tempq);
 								int temp_count_check = 1;
 								cll = new cell(cll->bu);
 								cright = new cell(cll->br);
@@ -713,7 +859,7 @@ int main(int argc, char** argw) {
 
 									temp_count_check++;
 									ucright++;
-									group1.push_back(temp_1); 
+									group1.push_back(temp_1);
 									cll = new cell(temp_1);
 
 									cright = new cell(cll->br);
@@ -726,7 +872,7 @@ int main(int argc, char** argw) {
 										temp_left = cleft->x * y + cleft->y;
 										temp_count_check++;
 										ucleft++;
-										group1.push_back(temp_left); 
+										group1.push_back(temp_left);
 										cll = new cell(temp_left);
 
 										cleft = new cell(cll->bl);
@@ -886,14 +1032,14 @@ int main(int argc, char** argw) {
 
 								temp_count_check++;
 								dtcdown++;
-								group2.push_back(temp_1); 
+								group2.push_back(temp_1);
 								cll = new cell(temp_1);
 
 								cdown = new cell(cll->bd);
 								temp_1 = cdown->x * y + cdown->y;
 
 							}
-							if (Matrixx[cup->x][cup->y] == 1 && tcup!=0) {
+							if (Matrixx[cup->x][cup->y] == 1 && tcup != 0) {
 								temp_count_check = 1;
 
 
@@ -902,7 +1048,7 @@ int main(int argc, char** argw) {
 
 									temp_count_check++;
 									dtcup++;
-									group2.push_back(temp_up); 
+									group2.push_back(temp_up);
 									cll = new cell(temp_up);
 
 									cup = new cell(cll->bu);
@@ -957,7 +1103,7 @@ int main(int argc, char** argw) {
 							if (Matrixx[q][r] == 1)
 							{
 								tempq = cll->bl;
-								group2.push_back(tempq); 
+								group2.push_back(tempq);
 								int temp_count_check = 1;
 								cll = new cell(cll->bl);
 								cdown = new cell(cll->bd);
@@ -971,7 +1117,7 @@ int main(int argc, char** argw) {
 
 									temp_count_check++;
 									ucdown++;
-									group2.push_back(temp_1); 
+									group2.push_back(temp_1);
 									cll = new cell(temp_1);
 
 									cdown = new cell(cll->bd);
@@ -985,7 +1131,7 @@ int main(int argc, char** argw) {
 									{
 										temp_count_check++;
 										ucup++;
-										group2.push_back(temp_up); 
+										group2.push_back(temp_up);
 										cll = new cell(temp_up);
 
 										cup = new cell(cll->bu);
@@ -1086,8 +1232,19 @@ int main(int argc, char** argw) {
 			cout << *j << " ";
 		id++;
 	}
+	
+	cout << "\nAfter elimination\n";
+	Groups GG(grp);
+	GG.ReduceGroups();
+	int idd = 0;
+	for (auto i = GG.GroupArray.begin(); i != GG.GroupArray.end(); ++i)
+	{
 
-
+		cout << "\nGrp" << idd << " : ";
+		for (auto j = GG.GroupArray[idd].begin(); j != GG.GroupArray[idd].end(); ++j)
+			cout << *j << " ";
+		idd++;
+	}
 
 	delete[] Arr;
 	for (unsigned int i = 0; i < x; i++) {
