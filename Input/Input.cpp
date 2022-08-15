@@ -596,13 +596,13 @@ public:
 
 			if (Item == Array[i]) {
 
-				return false;
+				return true;
 
 			}
 
 		}
 
-		return true;
+		return false;
 
 	}
 
